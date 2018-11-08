@@ -11,8 +11,8 @@ Log "Saving LVM layout."
 
     ## Get physical_device configuration
     # format: lvmdev <volume_group> <device> [<uuid>] [<size(bytes)>]
-    lvm 8>&- 7>&- pvdisplay -c | while read line ; do
-        pdev=$(echo $line | cut -d ":" -f "1")
+    lvm 8>&- 7>&- pvdisplay --columns --separator "|" | while read line ; do
+        pdev=$(echo $line | cut -d "|" -f "1")
 
         if [ "${pdev#/}" = "$pdev" ] ; then
             # Skip lines that are not describing physical devices
@@ -25,9 +25,9 @@ Log "Saving LVM layout."
             header_printed=1
         fi
 
-        vgrp=$(echo $line | cut -d ":" -f "2")
-        size=$(echo $line | cut -d ":" -f "3")
-        uuid=$(echo $line | cut -d ":" -f "12")
+        vgrp=$(echo $line | cut -d "|" -f "2")
+        size=$(echo $line | cut -d "|" -f "3")
+        uuid=$(echo $line | cut -d "|" -f "12")
 
         pdev=$(get_device_mapping $pdev)  # xlate through diskbyid_mappings file
         echo "lvmdev /dev/$vgrp $(get_device_name $pdev) $uuid $size"
